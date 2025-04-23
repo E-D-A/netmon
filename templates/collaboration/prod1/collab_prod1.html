@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Collaboration Overview - PROD1{% endblock %}
+{% block header %}Collaboration Overview - PROD1{% endblock %}
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <span class="breadcrumb-active">Collaboration - PROD1</span>
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+
+<!-- Alerts Section -->
+<div class="mb-4">
+  <div class="alert alert-danger d-flex align-items-center" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <div><strong>Alert:</strong> CMS Cluster 2 node 3 is unreachable.</div>
+  </div>
+</div>
+
+<!-- CUCM -->
+<div class="row mb-4 fade-in">
+  <div class="col-md-6">
+    <a href="{{ url_for('cucm_prod1') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Go to CUCM details" class="text-decoration-none text-dark">
+      <div class="card card-status card-dashboard h-100">
+        <div class="card-body">
+          <h5 class="card-title">CUCM - Status</h5>
+          <p class="card-text mb-1"><i class="bi bi-hdd-network me-1"></i> Version: 12.5.1</p>
+          <p class="card-text mb-1"><i class="bi bi-diagram-3 me-1"></i> Nodes: CUCM <span class="badge bg-success">3/3</span>, IM&amp;P <span class="badge bg-success">2/2</span></p>
+          <p class="card-text mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Health: <span class="badge bg-success">Healthy</span></p>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a href="{{ url_for('cucm_prod1') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Go to CUCM details" class="text-decoration-none text-dark">
+      <div class="card card-performance card-dashboard h-100">
+        <div class="card-body">
+          <h5 class="card-title">CUCM - Performance</h5>
+          <p class="card-text mb-1"><i class="bi bi-pc-display me-1"></i> Registered Devices: 342</p>
+          <p class="card-text mb-1"><i class="bi bi-telephone-inbound me-1"></i> Active Calls: 57</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- CMS -->
+<div class="row mb-4 fade-in">
+  <div class="col-md-6">
+    <a href="{{ url_for('cms_prod1') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Go to CMS details" class="text-decoration-none text-dark">
+      <div class="card card-status card-dashboard h-100">
+        <div class="card-body">
+          <h5 class="card-title">CMS - Status</h5>
+          <p class="card-text mb-1"><i class="bi bi-hdd-network me-1"></i> Version: 3.3.1</p>
+          <p class="card-text mb-1"><i class="bi bi-layers me-1"></i> Clusters: <span class="badge bg-success">2</span> | Health: <span class="badge bg-success">Healthy</span></p>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a href="{{ url_for('cms_prod1') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Go to CMS details" class="text-decoration-none text-dark">
+      <div class="card card-performance card-dashboard h-100">
+        <div class="card-body">
+          <h5 class="card-title">CMS - Performance</h5>
+          <p class="card-text mb-1"><i class="bi bi-camera-video me-1"></i> Active Conferences: 4</p>
+          <p class="card-text mb-1"><i class="bi bi-chat-dots me-1"></i> Active Participants: 26</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Expressway -->
+<div class="row mb-4 fade-in">
+  <div class="col-md-6">
+    <a href="{{ url_for('expressway_prod1') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Go to Expressway details" class="text-decoration-none text-dark">
+      <div class="card card-status card-dashboard h-100">
+        <div class="card-body">
+          <h5 class="card-title">Expressway - Status</h5>
+          <p class="card-text mb-1"><i class="bi bi-hdd-network me-1"></i> Version: X12.7.1</p>
+          <p class="card-text mb-1"><i class="bi bi-diagram-3 me-1"></i> Nodes: Core <span class="badge bg-success">4/4</span>, Edge <span class="badge bg-success">4/4</span></p>
+          <p class="card-text mb-1"><i class="bi bi-check-circle-fill text-success me-1"></i> Health: <span class="badge bg-success">Healthy</span></p>
+        </div>
+      </div>
+    </a>
+  </div>
+  <div class="col-md-6">
+    <a href="{{ url_for('expressway_prod1') }}" data-bs-toggle="tooltip" data-bs-placement="top" title="Go to Expressway details" class="text-decoration-none text-dark">
+      <div class="card card-performance card-dashboard h-100">
+        <div class="card-body">
+          <h5 class="card-title">Expressway - Performance</h5>
+          <p class="card-text mb-1"><i class="bi bi-telephone-inbound me-1"></i> Active Calls: 15</p>
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- Status Legend -->
+<div class="card mt-5">
+  <div class="card-body">
+    <h5 class="card-title mb-3">Status Legend</h5>
+    <p><i class="bi bi-check-circle-fill text-success me-1"></i> <strong>Healthy</strong> — All services and nodes are operating normally</p>
+    <p><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i> <strong>Warning</strong> — Minor issue or partial degradation</p>
+    <p><i class="bi bi-x-circle-fill text-danger me-1"></i> <strong>Critical</strong> — Major outage or component failure</p>
+  </div>
+</div>
+
+{% endblock %}

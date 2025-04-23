@@ -1,0 +1,65 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask stuff
+instance/
+.env
+*.env
+*.flaskenv
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+pip-selfcheck.json
+
+# VSCode
+.vscode/
+
+# Pytest
+.pytest_cache/
+
+# MyPy / Pylint / Coverage
+.mypy_cache/
+coverage.xml
+.coverage
+.cache
+nosetests.xml
+*.cover
+*.log
+
+# Mac/Linux/Windows OS files
+.DS_Store
+Thumbs.db
+
+# SQLite or other DBs
+*.sqlite3
+*.db
+
+# Logs and temp files
+*.log
+*.tmp
+*.bak
+
+# Netmon app-specific (if any)
+*.pid

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <title>{% block title %}Netmon{% endblock %}</title>
+  
+  <!-- Bootstrap + Icons -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-icons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<div class="d-flex {% if not sidebar %}no-sidebar{% endif %}" id="wrapper">
+
+  {% if sidebar is not defined or sidebar %}
+  <div class="bg-dark text-white" id="sidebar-wrapper">
+    <div class="sidebar-heading p-3 fs-4 fw-bold">Netmon</div>
+    <div class="list-group list-group-flush">
+
+      <a href="{{ url_for('dashboard') }}"
+        class="list-group-item list-group-item-action bg-dark text-white {% if request.path == url_for('dashboard') %}active-link{% endif %}">Dashboard</a>
+
+      <div class="list-group-item bg-dark text-white fw-bold">Collaboration</div>
+
+      <a href="{{ url_for('collab_prod1') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-4 {% if request.path == url_for('collab_prod1') %}active-link{% endif %}">PROD1</a>
+      <a href="{{ url_for('cucm_prod1') }}" 
+        class="list-group-item list-group-item-action bg-dark text-white ps-5 {% if request.path == url_for('cucm_prod1') %}active-link{% endif %}">CUCM</a>
+      <a href="{{ url_for('cms_prod1') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-5 {% if request.path == url_for('cms_prod1') %}active-link{% endif %}">CMS</a>
+      <a href="{{ url_for('expressway_prod1') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-5 {% if request.path == url_for('expressway_prod1') %}active-link{% endif %}">Expressway</a>
+
+      <a href="{{ url_for('collab_prod2') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-4 {% if request.path == url_for('collab_prod2') %}active-link{% endif %}">PROD2</a>
+      <a href="{{ url_for('cucm_prod2') }}" 
+        class="list-group-item list-group-item-action bg-dark text-white ps-5 {% if request.path == url_for('cucm_prod2') %}active-link{% endif %}">CUCM</a>
+      <a href="{{ url_for('cms_prod2') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-5 {% if request.path == url_for('cms_prod2') %}active-link{% endif %}">CMS</a>
+      <a href="{{ url_for('expressway_prod2') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-5 {% if request.path == url_for('expressway_prod2') %}active-link{% endif %}">Expressway</a>
+      {% if current_user.is_authenticated %}
+      <a href="{{ url_for('provisioning') }}"
+        class="list-group-item list-group-item-action bg-dark text-white {% if request.path == url_for('provisioning') %}active-link{% endif %}">Provisioning</a>
+      <a href="{{ url_for('task_history_page') }}"
+        class="list-group-item list-group-item-action bg-dark text-white ps-4 {% if request.path == url_for('task_history_page') %}active-link{% endif %}">Task History</a>
+        {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div id="page-content-wrapper" class="w-100">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-light bg-light shadow-sm">
+      <div class="container-fluid d-flex align-items-center justify-content-start gap-3">
+        <button class="btn btn-outline-primary" id="menu-toggle">☰</button>
+        <div class="breadcrumb-bar small text-muted">
+          {% block breadcrumbs %}{% endblock %}
+        </div>
+        <span class="navbar-brand ms-auto">{% block header %}{% endblock %}</span>
+        {% if current_user.is_authenticated %}
+          <span class="navbar-text me-2">
+            User: {{ current_user.username }}
+            <span class="badge bg-secondary">{{ current_user.role }}</span>
+          </span>
+          {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('manage_users') }}" class="btn btn-sm btn-outline-secondary me-2" title="User Management" data-bs-toggle="tooltip">
+              <i class="bi bi-gear"></i>
+            </a>
+          {% endif %}
+          <a class="btn btn-primary btn-sm" href="/logout">Logout</a>
+        {% else %}
+          <a class="btn btn-primary btn-sm" href="/login">Login</a>
+        {% endif %}
+      </div>
+    </nav>
+
+    <div class="container-fluid mt-4 pt-4">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+<script>
+  const wrapper = document.getElementById('wrapper');
+  const toggleBtn = document.getElementById('menu-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', function () {
+      wrapper.classList.toggle('toggled');
+    });
+  }
+
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+</script>
+
+</body>
+</html>

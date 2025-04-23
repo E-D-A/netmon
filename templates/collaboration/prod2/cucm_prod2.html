@@ -1,0 +1,535 @@
+{% extends "base.html" %}
+{% block title %}CUCM Monitoring{% endblock %}
+{% block header %}CUCM{% endblock %}
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('collab_prod2') }}">Collaboration - PROD2</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <span class="breadcrumb-active">CUCM</span>
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+
+<!-- System Info Section -->
+<h5 class="text-uppercase text-muted mb-3 mt-4"><i class="bi bi-cpu me-2"></i>CUCM System Info</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">CUCM Version</span>
+        <span class="fw-bold text-dark">12.5.1</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">IM&P Version</span>
+        <span class="fw-bold text-dark">12.5.1</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">Cluster Health</span>
+        <span class="badge bg-success">Healthy</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Section -->
+<div class="alert alert-warning small d-flex align-items-center mb-4 fade-in" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  <strong>Warning:</strong> cucm-sub2 is in degraded state. High CPU (79%) and service issues detected.
+</div>
+
+<!-- Performance Metrics -->
+<h5 class="text-uppercase text-muted mb-3"><i class="bi bi-graph-up-arrow me-2"></i>Performance</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="fw-bold text-muted mb-2">Registered Devices</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Total: <span class="fw-bold text-dark">333</span></li>
+        <li><i class="bi bi-telephone me-1 text-primary"></i> IP Phones: <span class="fw-bold text-dark">234</span></li>
+        <li><i class="bi bi-laptop me-1 text-primary"></i> Jabber: <span class="fw-bold text-dark">87</span></li>
+        <li><i class="bi bi-camera-video me-1 text-primary"></i> TelePresence: <span class="fw-bold text-dark">12</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CPU Load Card -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#cpuLoadModal" title="View live CPU load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+  
+      <div class="fw-bold text-muted mb-2">CPU Load (All Nodes)</div>
+  
+      <!-- CUCM section -->
+      <ul class="list-unstyled mb-0 small">
+        <li class="fw-semibold text-muted mb-1"><i class="bi bi-hdd-network text-primary me-1"></i> CUCM</li>
+        <li>Publisher: <span class="fw-bold text-success">18%</span></li>
+        <li>Subscriber 1: <span class="fw-bold text-warning">57%</span></li>
+        <li>Subscriber 2: <span class="fw-bold text-danger">89%</span></li>
+      </ul>
+  
+      <!-- Divider -->
+      <hr class="my-2">
+  
+      <!-- IM&P section -->
+      <ul class="list-unstyled mb-0 small">
+        <li class="fw-semibold text-muted mb-1"><i class="bi bi-chat-dots text-primary me-1"></i> IM&P</li>
+        <li>Publisher: <span class="fw-bold text-success">19%</span></li>
+        <li>Subscriber: <span class="fw-bold text-success">8%</span></li>
+      </ul>
+    </div>
+  </div>
+  
+  <!-- CUCM Calls Card -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#callLoadModal" title="View live chart">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">CUCM Call Load</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Active Calls: <span class="fw-bold text-dark">14</span></li>
+      </ul>
+      <canvas id="activeCallsChart" height="120"></canvas>
+    </div>    
+  </div>
+</div>
+
+
+<!-- Node and Service Status Table -->
+<h5 class="text-uppercase text-muted mb-3"><i class="bi bi-diagram-3 me-2"></i>Nodes & Services</h5>
+<div class="card table-wrapper shadow-sm mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Role</th>
+            <th>Hostname</th>
+            <th>Status</th>
+            <th>Uptime</th>
+            <th>Version</th>
+            <th>Services</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>CUCM Publisher</td>
+            <td>cucm-pub</td>
+            <td><span class="badge bg-success">Healthy</span></td>
+            <td>21 days</td>
+            <td>12.5.1</td>
+            <td>All running</td>
+          </tr>
+          <tr>
+            <td>CUCM Subscriber</td>
+            <td>cucm-sub1</td>
+            <td><span class="badge bg-success">Healthy</span></td>
+            <td>19 days</td>
+            <td>12.5.1</td>
+            <td>All running</td>
+          </tr>
+          <tr class="table-warning">
+            <td>CUCM Subscriber</td>
+            <td>cucm-sub2</td>
+            <td><span class="badge bg-warning text-dark">Degraded</span></td>
+            <td>4 days</td>
+            <td>12.5.1</td>
+            <td>
+              <i class="bi bi-exclamation-circle-fill text-warning" data-bs-toggle="tooltip" title="Cisco TFTP, Cisco CallManager"></i>
+            </td>
+          </tr>
+          <tr>
+            <td>IM&P Publisher</td>
+            <td>imp-pub</td>
+            <td><span class="badge bg-success">Healthy</span></td>
+            <td>30 days</td>
+            <td>12.5.1</td>
+            <td>All running</td>
+          </tr>
+          <tr class="table-danger">
+            <td>IM&P Subscriber</td>
+            <td>imp-sub</td>
+            <td><span class="badge bg-danger">Down</span></td>
+            <td>—</td>
+            <td>—</td>
+            <td>
+              <i class="bi bi-x-circle-fill text-danger" data-bs-toggle="tooltip" title="Cisco XCP Router, Cisco XCP Authentication Service"></i>
+            </td>
+          </tr>
+        </tbody>        
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="callLoadModal" tabindex="-1" aria-labelledby="callLoadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      
+      <!-- Header -->
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="callLoadModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live CUCM Call Load
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      
+      <!-- Chart Container -->
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="callLoadChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="chartExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartLiveChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="cpuLoadModal" tabindex="-1" aria-labelledby="cpuLoadModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+
+      <!-- Header -->
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="cpuLoadModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live CPU Load - CUCM & IM&P
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadCpuChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Chart Body -->
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="cpuLoadChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+        <div id="cpuChartExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+          <div>
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Live CPU chart session ended after 2 minutes.
+          </div>
+          <button id="restartCpuChartBtn" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-arrow-clockwise me-1"></i> Restart
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<!-- Chart.js -->
+<script src="{{ url_for('static', filename='js/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chartjs-adapter-date-fns.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+<!-- Live Updating Modal CUCM Call Chart -->
+<script>
+  let callChart = null;
+  let callChartInterval = null;
+  let liveChartTimeout = null;
+
+  function addLiveData(chart) {
+    const timestamp = getTimestamp();
+    const newValue = getRandomValue();
+    chart.data.datasets[0].data.push({ x: timestamp, y: newValue });
+
+    if (chart.data.datasets[0].data.length > 50) {
+      chart.data.datasets[0].data.shift();
+    }
+
+    chart.update('none');
+  }
+
+  document.getElementById('callLoadModal').addEventListener('shown.bs.modal', () => {
+    if (!callChart) {
+      const ctx = document.getElementById('callLoadChart').getContext('2d');
+      callChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: [{
+            label: 'Active Calls',
+            data: [],
+            borderColor: '#0d6efd',
+            backgroundColor: 'rgba(13,110,253,0.1)',
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: { duration: 300, easing: 'easeOutQuart' },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#212529',
+              titleColor: '#fff',
+              bodyColor: '#fff',
+              borderColor: '#6c757d',
+              borderWidth: 1,
+              padding: 10
+            }
+          },
+          layout: {
+            padding: { 
+              top: 40, 
+              right: 12
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'second',
+                tooltipFormat: 'HH:mm:ss',
+                displayFormats: {
+                  second: 'HH:mm:ss',
+                  minute: 'HH:mm'
+                }
+              },
+              ticks: {
+                source: 'data',
+                autoSkip: true,
+                maxTicksLimit: 5,
+                maxRotation: 0,
+                color: '#333'
+              },
+              grid: { color: '#eee' }
+            },
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: { stepSize: 10 },
+              title: {
+                display: true,
+                text: 'Active Calls'
+              }
+            }
+          }
+        }
+      });
+
+      // Preload 10 points
+      for (let i = 10; i > 0; i--) {
+        const t = new Date(Date.now() - i * 3000);
+        callChart.data.datasets[0].data.push({ x: t.toISOString(), y: getRandomValue() });
+      }
+      callChart.update();
+    }
+
+    // Start live update + timeout
+    callChartInterval = setInterval(() => addLiveData(callChart), 3000);
+    liveChartTimeout = setTimeout(() => {
+      clearInterval(callChartInterval);
+      document.getElementById('chartExpiredNotice').classList.remove('d-none');
+    }, MAX_LIVE_DURATION);
+  });
+
+  document.getElementById('callLoadModal').addEventListener('hidden.bs.modal', () => {
+    clearInterval(callChartInterval);
+    clearTimeout(liveChartTimeout);
+    document.getElementById('chartExpiredNotice').classList.add('d-none');
+  });
+
+  document.getElementById('restartLiveChartBtn').addEventListener('click', () => {
+    document.getElementById('chartExpiredNotice').classList.add('d-none');
+
+    callChartInterval = setInterval(() => addLiveData(callChart), 3000);
+    liveChartTimeout = setTimeout(() => {
+      clearInterval(callChartInterval);
+      document.getElementById('chartExpiredNotice').classList.remove('d-none');
+    }, MAX_LIVE_DURATION);
+  });
+
+  document.getElementById('downloadChartBtn').addEventListener('click', () => {
+    downloadChartWithTitle(callChart, 'cucm-calls.png', 'CUCM Calls');
+  });
+
+</script>
+
+<!-- Live Updating Modal Chart CPU  & CUBE -->
+<script>
+  let cpuChart = null;
+  let cpuInterval = null;
+  let cpuTimeout = null;
+
+  // ==== CPU Modal ====
+  const cpuNodes = ['CUCM PUB', 'CUCM SUB1', 'CUCM SUB2', 'IMP PUB', 'IMP SUB'];
+  const cpuColors = ['#0d6efd', '#6610f2', '#6f42c1', '#fd7e14', '#dc3545'];
+
+  document.getElementById('cpuLoadModal').addEventListener('shown.bs.modal', () => {
+    if (!cpuChart) {
+      const ctx = document.getElementById('cpuLoadChart').getContext('2d');
+
+      cpuChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          datasets: cpuNodes.map((label, i) => ({
+            label,
+            data: [],
+            borderColor: cpuColors[i],
+            backgroundColor: cpuColors[i] + '22',
+            tension: 0.3,
+            fill: false
+          }))
+        },
+        options: {
+          responsive: true,
+          plugins: { 
+            legend: { 
+              display: true,
+              position: 'bottom',
+              labels: {
+                color: '#333',
+                usePointStyle: true,
+                boxWidth: 10,
+                padding: 16
+              }                
+            }
+          },
+          layout: {
+            padding: { 
+              top: 40, 
+              right: 12
+            }
+          },
+          scales: {
+            x: {
+              type: 'time',
+              time: {
+                unit: 'second',
+                tooltipFormat: 'HH:mm:ss',
+                displayFormats: {
+                  second: 'HH:mm:ss',
+                  minute: 'HH:mm'
+                }
+              },
+              ticks: {
+                source: 'data',
+                autoSkip: true,
+                maxTicksLimit: 5,
+                maxRotation: 0,
+                color: '#333'
+              },
+              grid: { color: '#eee' }
+            },
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: { display: true, text: 'CPU %' }
+            }
+          }
+        }
+      });
+
+      for (let i = 0; i < cpuNodes.length; i++) {
+        for (let j = 10; j > 0; j--) {
+          cpuChart.data.datasets[i].data.push({
+            x: new Date(Date.now() - j * 3000).toISOString(),
+            y: getRandomValue(15, 60)
+          });
+        }
+      }
+      cpuChart.update();
+    }
+
+    cpuInterval = setInterval(() => {
+      cpuChart.data.datasets.forEach(ds => {
+        ds.data.push({ x: getTimestamp(), y: getRandomValue(15, 60) });
+        if (ds.data.length > 50) ds.data.shift();
+      });
+      cpuChart.update('none');
+    }, 3000);
+
+    cpuTimeout = setTimeout(() => {
+      clearInterval(cpuInterval);
+      document.getElementById('cpuChartExpiredNotice').classList.remove('d-none');
+    }, MAX_LIVE_DURATION);
+  });
+
+  document.getElementById('cpuLoadModal').addEventListener('hidden.bs.modal', () => {
+    clearInterval(cpuInterval);
+    clearTimeout(cpuTimeout);
+    document.getElementById('cpuChartExpiredNotice').classList.add('d-none');
+  });
+
+  document.getElementById('restartCpuChartBtn').addEventListener('click', () => {
+    document.getElementById('cpuChartExpiredNotice').classList.add('d-none');
+    cpuInterval = setInterval(() => {
+      cpuChart.data.datasets.forEach(ds => {
+        ds.data.push({ x: getTimestamp(), y: getRandomValue(15, 60) });
+        if (ds.data.length > 50) ds.data.shift();
+      });
+      cpuChart.update('none');
+    }, 3000);
+    cpuTimeout = setTimeout(() => {
+      clearInterval(cpuInterval);
+      document.getElementById('cpuChartExpiredNotice').classList.remove('d-none');
+    }, MAX_LIVE_DURATION);
+  });
+
+  document.getElementById('downloadCpuChartBtn').addEventListener('click', () => {
+    downloadChartWithTitle(cpuChart, 'cucm-cpu-load.png', 'CUCM Prod1 – CPU Load');
+  });
+
+</script>
+
+<!-- Small chart script -->
+<script>
+  const ctxActive = document.getElementById('activeCallsChart');
+
+  new Chart(ctxActive, {
+    type: 'line',
+    data: {
+      labels: ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00'],
+      datasets: [{
+        label: 'Active Calls',
+        data: [42, 45, 50, 57, 54, 48, 51],
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+        tension: 0.3,
+        fill: true
+      }]
+    },
+    options: { responsive: true, plugins: { legend: { display: false } } }
+  });
+
+</script>
+
+{% endblock %}

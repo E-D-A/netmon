@@ -1,0 +1,902 @@
+{% extends 'base.html' %}
+{% block title %}Expressway - PROD1{% endblock %}
+{% block header %}Expressway - PROD1{% endblock %}
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('collab_prod1') }}">Collaboration - PROD1</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <span class="breadcrumb-active">Expressway</span>
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+
+<!-- System Info -->
+<h5 class="text-uppercase text-muted mb-3 mt-4"><i class="bi bi-cpu me-2"></i>Expressway System Info</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">Expressway Version</span>
+        <span class="fw-bold text-dark">14.2</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">Cluster Health</span>
+        <span class="badge bg-success">Healthy</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Section -->
+<div class="alert alert-warning small d-flex align-items-center mb-4 fade-in" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  <strong>Warning:</strong> Cluster 1 Edge 1 is in degraded state. High CPU (79%) and service issues detected.
+</div>
+
+<!-- Cluster 1 -->
+<h5 class="text-uppercase text-muted mb-3"><i class="bi bi-diagram-3 me-2"></i>Cluster 1</h5>
+<div class="row g-3 mb-4">
+
+  <!-- CPU Load - Core -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expCoreModal" title="Live CPU Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">CPU Load (Core)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Node 1: <span class="fw-bold text-success">24%</span></li>
+        <li>Node 2: <span class="fw-bold text-success">28%</span></li>
+        <li>Node 3: <span class="fw-bold text-success">26%</span></li>
+        <li>Node 4: <span class="fw-bold text-warning">51%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CPU Load - Edge -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expEdgeModal" title="Live CPU Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">CPU Load (Edge)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Node 1: <span class="fw-bold text-success">21%</span></li>
+        <li>Node 2: <span class="fw-bold text-success">24%</span></li>
+        <li>Node 3: <span class="fw-bold text-success">26%</span></li>
+        <li>Node 4: <span class="fw-bold text-warning">55%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Call Load - Core -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expCluster1CoreModal" title="Live Call Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">Call Load (Core)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Total Participants: <span class="fw-bold text-dark">73</span></li>
+      </ul>
+      <canvas id="expCluster1CoreChartCard" height="120" class="w-100"></canvas>
+    </div>
+  </div>
+
+  <!-- Call Load - Edge -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expCluster1EdgeModal" title="Live Call Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">Call Load (Edge)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Total Participants: <span class="fw-bold text-dark">58</span></li>
+      </ul>
+      <canvas id="expCluster1EdgeChartCard" height="120" class="w-100"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Cluster 2 -->
+<h5 class="text-uppercase text-muted mb-3"><i class="bi bi-diagram-3 me-2"></i>Cluster 2</h5>
+<div class="row g-3 mb-4">
+
+  <!-- CPU Load - Core -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expCoreModal2" title="Live CPU Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">CPU Load (Core)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Node 1: <span class="fw-bold text-success">26%</span></li>
+        <li>Node 2: <span class="fw-bold text-success">29%</span></li>
+        <li>Node 3: <span class="fw-bold text-success">25%</span></li>
+        <li>Node 4: <span class="fw-bold text-success">28%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CPU Load - Edge -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expEdgeModal2" title="Live CPU Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">CPU Load (Edge)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Node 1: <span class="fw-bold text-success">22%</span></li>
+        <li>Node 2: <span class="fw-bold text-success">25%</span></li>
+        <li>Node 3: <span class="fw-bold text-success">27%</span></li>
+        <li>Node 4: <span class="fw-bold text-success">26%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Call Load - Core -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expCluster2CoreModal" title="Live Call Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">Call Load (Core)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Total Participants: <span class="fw-bold text-dark">61</span></li>
+      </ul>
+      <canvas id="expCluster2CoreChartCard" class="w-100" height="120"></canvas>      
+    </div>
+  </div>
+
+  <!-- Call Load - Edge -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#expCluster2EdgeModal" title="Live Call Load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">Call Load (Edge)</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Total Participants: <span class="fw-bold text-dark">49</span></li>
+      </ul>
+      <canvas id="expCluster2EdgeChartCard" class="w-100" height="120"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<!-- Cluster 1 – Core CPU Modal -->
+<div class="modal fade" id="expCoreModal" tabindex="-1" aria-labelledby="expCoreModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expCoreModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live CPU Load – Cluster 1 (Core)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpCoreChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expCoreChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expCoreChartNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpCoreChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cluster 1 – Edge CPU Modal -->
+<div class="modal fade" id="expEdgeModal" tabindex="-1" aria-labelledby="expEdgeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expEdgeModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live CPU Load – Cluster 1 (Edge)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpEdgeChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expEdgeChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expEdgeChartNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpEdgeChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cluster 2 – Core CPU Modal -->
+<div class="modal fade" id="expCoreModal2" tabindex="-1" aria-labelledby="expCoreModal2Label" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expCoreModal2Label">
+          <i class="bi bi-graph-up me-2"></i> Live CPU Load – Cluster 2 (Core)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpCoreChartBtn2" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expCoreChart2" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expCoreChartNotice2" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpCoreChartBtn2" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cluster 2 – Edge CPU Modal -->
+<div class="modal fade" id="expEdgeModal2" tabindex="-1" aria-labelledby="expEdgeModal2Label" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expEdgeModal2Label">
+          <i class="bi bi-graph-up me-2"></i> Live CPU Load – Cluster 2 (Edge)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpEdgeChartBtn2" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expEdgeChart2" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expEdgeChartNotice2" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpEdgeChartBtn2" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Call Load Modal – Cluster 1 Edge -->
+<div class="modal fade" id="expCluster1EdgeModal" tabindex="-1" aria-labelledby="expCluster1EdgeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expCluster1EdgeModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live Call Load – Cluster 1 (Edge)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpEdge1ChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expCluster1EdgeChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expEdge1ExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpEdge1ChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Call Load Modal – Cluster 1 Core -->
+<div class="modal fade" id="expCluster1CoreModal" tabindex="-1" aria-labelledby="expCluster1CoreModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expCluster1CoreModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live Call Load – Cluster 1 (Core)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpCore1ChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expCluster1CoreChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expCore1ExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpCore1ChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Call Load Modal – Cluster 2 Edge -->
+<div class="modal fade" id="expCluster2EdgeModal" tabindex="-1" aria-labelledby="expCluster2EdgeModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expCluster2EdgeModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live Call Load – Cluster 2 (Edge)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpEdge2ChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expCluster2EdgeChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expEdge2ExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpEdge2ChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Call Load Modal – Cluster 2 Core -->
+<div class="modal fade" id="expCluster2CoreModal" tabindex="-1" aria-labelledby="expCluster2CoreModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="expCluster2CoreModalLabel">
+          <i class="bi bi-graph-up me-2"></i> Live Call Load – Cluster 2 (Core)
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadExpCore2ChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="expCluster2CoreChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+      <div id="expCore2ExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartExpCore2ChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chartjs-adapter-date-fns.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+<!-- CPU Live script -->
+<script>
+  function createLiveDataset(label, color) {
+    return {
+      label,
+      data: [],
+      borderColor: color,
+      backgroundColor: color + '20',
+      fill: true,
+      tension: 0.4
+    };
+  }
+
+  function setupModalChart(modalId, canvasId, restartBtnId, expiredNoticeId, downloadBtnId, nodeLabels) {
+    let chart = null;
+    let interval = null;
+    let timeout = null;
+
+    const colors = ['#0d6efd', '#198754', '#ffc107', '#dc3545'];
+
+    document.getElementById(modalId).addEventListener('shown.bs.modal', () => {
+      if (!chart) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        const datasets = nodeLabels.map((label, idx) => {
+          const ds = createLiveDataset(label, colors[idx % colors.length]);
+          preloadData(ds);
+          return ds;
+        });
+
+        chart = new Chart(ctx, {
+          type: 'line',
+          data: { datasets },
+          options: {
+            responsive: true,
+            animation: { duration: 300, easing: 'easeOutQuart' },
+            plugins: { 
+              legend: { 
+                display: true,
+                position: 'bottom',
+                labels: {
+                  color: '#333',
+                  usePointStyle: true,
+                  boxWidth: 10,
+                  padding: 16
+                }                
+              }
+            },
+            layout: {
+              padding: { 
+                top: 40, 
+                right: 12
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'second',
+                  tooltipFormat: 'HH:mm:ss',
+                  displayFormats: {
+                    second: 'HH:mm:ss',
+                    minute: 'HH:mm'
+                  }
+                },
+                ticks: {
+                  source: 'data',
+                  autoSkip: true,
+                  maxTicksLimit: 5,
+                  maxRotation: 0,
+                  color: '#333'
+                },
+                grid: { color: '#eee' }
+              },
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { stepSize: 20 },
+                grid: { color: '#eee' },
+                title: {
+                  display: true,
+                  text: 'CPU %'
+                }
+              }
+            },
+            elements: {
+              point: { radius: 3 }
+            }
+          }
+        });
+      }
+
+      interval = setInterval(() => {
+        chart.data.datasets.forEach(ds => addLivePoint(ds));
+        chart.update('none');
+      }, 3000);
+
+      timeout = setTimeout(() => {
+        clearInterval(interval);
+        document.getElementById(expiredNoticeId).classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    document.getElementById(modalId).addEventListener('hidden.bs.modal', () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+      document.getElementById(expiredNoticeId).classList.add('d-none');
+    });
+
+    document.getElementById(restartBtnId).addEventListener('click', () => {
+      document.getElementById(expiredNoticeId).classList.add('d-none');
+      interval = setInterval(() => {
+        chart.data.datasets.forEach(ds => addLivePoint(ds));
+        chart.update('none');
+      }, 3000);
+      timeout = setTimeout(() => {
+        clearInterval(interval);
+        document.getElementById(expiredNoticeId).classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    document.getElementById(downloadBtnId).addEventListener('click', () => {
+      downloadChartWithTitle(chart, `${canvasId}.png`, 'Expressway CPU');
+    });
+  }
+
+  // Setup all 4 modals
+  setupModalChart("expCoreModal", "expCoreChart", "restartExpCoreChartBtn", "expCoreChartNotice", "downloadExpCoreChartBtn",
+    ["Core 1", "Core 2", "Core 3", "Core 4"]);
+
+  setupModalChart("expEdgeModal", "expEdgeChart", "restartExpEdgeChartBtn", "expEdgeChartNotice", "downloadExpEdgeChartBtn",
+    ["Edge 1", "Edge 2", "Edge 3", "Edge 4"]);
+
+  setupModalChart("expCoreModal2", "expCoreChart2", "restartExpCoreChartBtn2", "expCoreChartNotice2", "downloadExpCoreChartBtn2",
+    ["Core 1", "Core 2", "Core 3", "Core 4"]);
+
+  setupModalChart("expEdgeModal2", "expEdgeChart2", "restartExpEdgeChartBtn2", "expEdgeChartNotice2", "downloadExpEdgeChartBtn2",
+    ["Edge 1", "Edge 2", "Edge 3", "Edge 4"]);
+</script>
+
+<!-- Call Load Live script -->
+<script>
+  const callColors = ['#0d6efd', '#198754', '#ffc107', '#dc3545'];
+
+  function createMultiLineChart(ctx, labels) {
+    return new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: labels.map((label, index) => ({
+          label,
+          data: [],
+          borderColor: callColors[index % callColors.length],
+          backgroundColor: callColors[index % callColors.length] + '20',
+          fill: true,
+          tension: 0.4,
+          pointRadius: 3
+        }))
+      },
+      options: {
+        responsive: true,
+        animation: { duration: 300, easing: 'easeOutQuart' },
+        layout: { padding: { top: 40, right: 12 } },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: '#333',
+              usePointStyle: true,
+              boxWidth: 10,
+              padding: 16
+            }
+          },
+          tooltip: {
+            backgroundColor: '#212529',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#6c757d',
+            borderWidth: 1,
+            padding: 10
+          }
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'second',
+              tooltipFormat: 'HH:mm:ss',
+              displayFormats: {
+                second: 'HH:mm:ss',
+                minute: 'HH:mm'
+              }
+            },
+            ticks: {
+              source: 'data',
+              autoSkip: true,
+              maxTicksLimit: 5,
+              maxRotation: 0,
+              color: '#333'
+            },
+            grid: { color: '#eee' }
+          },
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: { display: true, text: 'Calls' },
+            ticks: { stepSize: 10 },
+            grid: { color: '#eee' }
+          }
+        }
+      }
+    });
+  }
+
+  function setupLiveChart(modalId, canvasId, restartId, alertId, downloadBtnId, labels) {
+    let chart = null;
+    let interval = null;
+    let timeout = null;
+
+    document.getElementById(modalId).addEventListener('shown.bs.modal', () => {
+      if (!chart) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        chart = createMultiLineChart(ctx, labels);
+        preloadChartData(chart, labels.length);
+      }
+
+      interval = setInterval(() => {
+        const now = getTimestamp();
+        chart.data.labels.push(now);
+        chart.data.labels = chart.data.labels.slice(-50);
+        chart.data.datasets.forEach(ds => {
+          ds.data.push(getRandomValue());
+          ds.data = ds.data.slice(-50);
+        });
+        chart.update('none');
+      }, 3000);
+
+      timeout = setTimeout(() => {
+        clearInterval(interval);
+        document.getElementById(alertId).classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    document.getElementById(modalId).addEventListener('hidden.bs.modal', () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+      document.getElementById(alertId).classList.add('d-none');
+    });
+
+    document.getElementById(restartId).addEventListener('click', () => {
+      document.getElementById(alertId).classList.add('d-none');
+      interval = setInterval(() => {
+        const now = getTimestamp();
+        chart.data.labels.push(now);
+        chart.data.labels = chart.data.labels.slice(-50);
+        chart.data.datasets.forEach(ds => {
+          ds.data.push(getRandomValue());
+          ds.data = ds.data.slice(-50);
+        });
+        chart.update('none');
+      }, 3000);
+      timeout = setTimeout(() => {
+        clearInterval(interval);
+        document.getElementById(alertId).classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    document.getElementById(downloadBtnId).addEventListener('click', () => {
+      downloadChartWithTitle(chart, `${canvasId}.png`, 'Expressway Calls');
+    });
+  }
+
+  // Setup for all 4 Expressway Call Load charts
+  setupLiveChart('expCluster1EdgeModal', 'expCluster1EdgeChart', 'restartExpEdge1ChartBtn', 'expEdge1ExpiredNotice', 'downloadExpEdge1ChartBtn', ['Edge 1', 'Edge 2', 'Edge 3', 'Edge 4']);
+  setupLiveChart('expCluster1CoreModal', 'expCluster1CoreChart', 'restartExpCore1ChartBtn', 'expCore1ExpiredNotice', 'downloadExpCore1ChartBtn', ['Core 1', 'Core 2', 'Core 3', 'Core 4']);
+  setupLiveChart('expCluster2EdgeModal', 'expCluster2EdgeChart', 'restartExpEdge2ChartBtn', 'expEdge2ExpiredNotice', 'downloadExpEdge2ChartBtn', ['Edge 1', 'Edge 2', 'Edge 3', 'Edge 4']);
+  setupLiveChart('expCluster2CoreModal', 'expCluster2CoreChart', 'restartExpCore2ChartBtn', 'expCore2ExpiredNotice', 'downloadExpCore2ChartBtn', ['Core 1', 'Core 2', 'Core 3', 'Core 4']);
+</script>
+
+<!-- Small chart script -->
+<script>
+  const expLabels = ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00'];
+
+  const expresswayMiniChartDefaults = getMiniChartDefaults()
+
+  const chartConfigs = [
+    {
+      id: 'expCluster1EdgeChartCard',
+      datasets: [
+        {
+          label: 'Edge 1',
+          data: [22, 25, 28, 24, 26, 30, 29],
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13,110,253,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Edge 2',
+          data: [20, 22, 26, 23, 25, 27, 26],
+          borderColor: '#198754',
+          backgroundColor: 'rgba(25,135,84,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Edge 3',
+          data: [18, 20, 24, 21, 22, 25, 23],
+          borderColor: '#ffc107',
+          backgroundColor: 'rgba(255,193,7,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Edge 4',
+          data: [16, 18, 22, 19, 21, 23, 20],
+          borderColor: '#dc3545',
+          backgroundColor: 'rgba(220,53,69,0.1)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    },
+    {
+      id: 'expCluster1CoreChartCard',
+      datasets: [
+        {
+          label: 'Core 1',
+          data: [14, 18, 17, 19, 21, 20, 18],
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13,110,253,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Core 2',
+          data: [13, 16, 15, 18, 19, 18, 17],
+          borderColor: '#198754',
+          backgroundColor: 'rgba(25,135,84,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Core 3',
+          data: [12, 15, 14, 16, 17, 16, 15],
+          borderColor: '#ffc107',
+          backgroundColor: 'rgba(255,193,7,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Core 4',
+          data: [11, 14, 13, 15, 16, 15, 14],
+          borderColor: '#dc3545',
+          backgroundColor: 'rgba(220,53,69,0.1)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    },
+    {
+      id: 'expCluster2EdgeChartCard',
+      datasets: [
+        {
+          label: 'Edge 1',
+          data: [15, 19, 18, 22, 24, 23, 20],
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13,110,253,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Edge 2',
+          data: [13, 17, 16, 19, 21, 20, 18],
+          borderColor: '#198754',
+          backgroundColor: 'rgba(25,135,84,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Edge 3',
+          data: [12, 15, 14, 17, 18, 17, 15],
+          borderColor: '#ffc107',
+          backgroundColor: 'rgba(255,193,7,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Edge 4',
+          data: [10, 14, 13, 16, 17, 16, 13],
+          borderColor: '#dc3545',
+          backgroundColor: 'rgba(220,53,69,0.1)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    },
+    {
+      id: 'expCluster2CoreChartCard',
+      datasets: [
+        {
+          label: 'Core 1',
+          data: [11, 15, 13, 16, 18, 17, 14],
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13,110,253,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Core 2',
+          data: [10, 14, 12, 15, 17, 16, 13],
+          borderColor: '#198754',
+          backgroundColor: 'rgba(25,135,84,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Core 3',
+          data: [9, 13, 11, 14, 16, 15, 12],
+          borderColor: '#ffc107',
+          backgroundColor: 'rgba(255,193,7,0.1)',
+          fill: true,
+          tension: 0.3
+        },
+        {
+          label: 'Core 4',
+          data: [8, 12, 10, 13, 15, 14, 11],
+          borderColor: '#dc3545',
+          backgroundColor: 'rgba(220,53,69,0.1)',
+          fill: true,
+          tension: 0.3
+        }
+      ]
+    }
+  ];
+
+  chartConfigs.forEach(config => {
+    const ctx = document.getElementById(config.id)?.getContext('2d');
+    if (ctx) {
+      new Chart(ctx, {
+        ...expresswayMiniChartDefaults,
+        data: {
+          labels: expLabels,
+          datasets: config.datasets
+        }
+      });
+    }
+  });
+</script>
+
+{% endblock %}

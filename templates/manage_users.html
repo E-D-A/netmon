@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users - Netmon{% endblock %}
+{% block header %}Manage Users{% endblock %}
+{% block content %}
+<div id="flash-container" class="position-fixed end-0 p-3" style="z-index: 1050;">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+  
+<h3>User Roles</h3>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Username</th>
+      <th>Current Role</th>
+      <th>Change Role</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.username }}</td>
+      <td>
+        {{ user.role }}
+        {% if user.id == current_user.id %}
+          <span class="badge bg-info ms-2">You</span>
+        {% endif %}
+      </td>
+      <td>
+        {% if user.id == current_user.id %}
+          <span class="text-muted">Can't change your own role</span>
+        {% else %}
+          <form method="POST" class="d-flex align-items-center gap-2">
+            <input type="hidden" name="user_id" value="{{ user.id }}">
+            <select name="role" class="form-select form-select-sm">
+              <option value="read-only" {% if user.role == 'read-only' %}selected{% endif %}>Read-only</option>
+              <option value="provisioner" {% if user.role == 'provisioner' %}selected{% endif %}>Provisioner</option>
+              <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+            </select>
+            <button type="submit" class="btn btn-sm btn-primary">Update</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<script>
+    // Auto-dismiss alerts after 3 seconds
+    setTimeout(() => {
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+        bsAlert.close();
+      });
+    }, 5000);
+  </script>
+  
+{% endblock %}

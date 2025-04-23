@@ -1,0 +1,645 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block header %}Dashboard{% endblock %}
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <span class="breadcrumb-active">Provisioning</span>
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>CUCM Provisioning</h2>
+    <div>
+      <form id="search-form" class="d-flex" style="max-width: 300px; display: inline-flex;">
+        <input type="text" id="searchInput" class="form-control" placeholder="Search user, phone, extension...">
+        <button class="btn btn-outline-secondary ms-2" type="submit">Search</button>
+      </form>
+      <div class="mt-2 text-end">
+        <button id="openTaskHistoryBtn" class="btn btn-sm btn-outline-primary">Recent Tasks</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Task History Modal -->
+  <div class="modal fade" id="taskHistoryModal" tabindex="-1" aria-labelledby="taskHistoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header d-flex justify-content-between align-items-center">
+          <h5 class="modal-title mb-0" id="taskHistoryModalLabel">Provisioning Task History</h5>
+          <div class="d-flex align-items-center gap-2">
+            <a href="/task-history" class="btn btn-sm btn-outline-secondary">View Full History</a>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group" id="taskHistoryList">
+            <!-- Dynamic task entries -->
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Associated CUCM Objects Modal -->
+  <div class="modal fade" id="associatedModal" tabindex="-1" aria-labelledby="associatedModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Associated CUCM Objects</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="associatedContent">
+          <!-- Populated dynamically -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-warning" onclick="modifyExtension()">Modify Extension</button>
+          <button class="btn btn-danger" onclick="confirmDelete()">Delete All Services</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modify Extension Modal -->
+  <div class="modal fade" id="modifyExtensionModal" tabindex="-1" aria-labelledby="modifyExtensionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modifyExtensionModalLabel">Modify Extension</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="newExtensionInput" class="form-label">New Extension</label>
+            <input type="text" id="newExtensionInput" class="form-control" placeholder="Enter new extension">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-primary" onclick="confirmModifyExtension()">Confirm</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Deletion</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Are you sure you want to delete all services for this user?
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button class="btn btn-danger" onclick="runDeletionTask()">Yes, Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <div id="searchWrapper" class="card mb-4" style="display: none;">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <span>Search Results</span>
+      <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="collapse" data-bs-target="#searchResultsCollapse" aria-expanded="false" aria-controls="searchResultsCollapse">
+        Toggle Results
+      </button>
+    </div>
+    <div class="collapse" id="searchResultsCollapse">
+      <div class="card-body">
+        <ul class="list-group" id="resultList"></ul>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Automated Provisioning Section -->
+  <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>Automated Provisioning</h5>
+    </div>
+    <div class="card-body">
+      <p>The provisioning job runs every 4 hours and listens for CUCM user changes. You can trigger it manually if needed.<br>
+        The CUCM LDAP sync runs every night against the AD. You can also trigger it manually to make sure recent user changes are synced.
+      </p>
+      <button id="ldapSyncBtn" class="btn btn-primary me-2" onclick="triggerLDAPSync()">Trigger CUCM LDAP Sync</button>
+      <button id="triggerAutoProvisionBtn" class="btn btn-success" onclick="triggerAutoProvisioning()">
+        Run Provisioning Now
+      </button>
+    </div>
+  </div>
+
+  <!-- Manual Provisioning Section -->
+  <div class="card mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h5>Manual Provisioning</h5>
+    </div>
+    <div class="card-body">
+      <form id="manual-provision-form">
+        <div class="mb-3">
+          <label for="userId" class="form-label">User ID</label>
+          <input type="text" id="userId" class="form-control" required>
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Extension Assignment</label><br>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="extensionOption" id="autoExt" value="auto" checked>
+            <label class="form-check-label" for="autoExt">Automatic</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="extensionOption" id="manualExt" value="manual">
+            <label class="form-check-label" for="manualExt">Manual</label>
+          </div>
+          <input type="text" id="manualExtension" class="form-control mt-2" placeholder="Enter extension manually" disabled>
+        </div>
+        <button type="submit" class="btn btn-primary">Run Provisioning</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="position-fixed top-0 end-0 p-3" style="z-index: 1055">
+    <div id="taskToast" class="toast align-items-center text-bg-info border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="taskToastBody">
+          Task started.
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Live Task Status -->
+  <div id="taskStatus" class="alert alert-info mt-3" style="display: none;">
+    Task is running in the background. Status will update here...
+  </div>
+
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+<script>
+  let lastExpandedTaskId = null;
+  let pendingModifyUserId = null;
+  let taskPollingInterval = null;
+  let lastKnownTaskCount = 0;
+  const activePollers = new Set(); // keep track of tasks that we poll
+  const taskExtensions = {}; // track extension linked to task
+  const currentUsername = "{{ current_user.username if current_user.is_authenticated else 'Unknown' }}";
+
+  async function createProvisioningTask(action, user, extension) {
+    try {
+      const res = await fetch("http://localhost:9999/api/provision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: action, user, extension, source: "Manual", triggered_by: currentUsername })
+      });
+
+      const data = await res.json();
+      const taskId = data.task_id;
+
+      // Store original extension
+      taskExtensions[taskId] = extension;
+      
+      showToast(`Task started: ${action} for ${user}`);
+      await renderTaskHistory();
+      openTaskHistory();
+      pollTaskStatus(taskId);
+    } catch (error) {
+      console.error(`${action} failed:`, error);
+      alert(`Failed to start task: ${action}`);
+    }
+  }
+
+  function pollTaskStatus(taskId) {
+    if (activePollers.has(taskId)) {
+      return; // Already polling this task, don't start another
+    }
+    activePollers.add(taskId); // Mark task as active
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`http://localhost:9999/api/task-status/${taskId}`);
+        const task = await res.json();
+
+        // Update steps only for this task
+        const container = document.querySelector(`[id^="task-steps-${task.id}"] ul`);
+        if (container) {
+          container.innerHTML = task.steps.map(step => `
+            <li class='list-group-item d-flex align-items-center'>
+              ${step.status === 'done' ? "<span class='text-success me-2'>&#10003;</span>" :
+                step.status === 'failed' ? "<span class='text-danger me-2'>&#10060;</span>" :
+                "<span class='spinner-border spinner-border-sm text-secondary me-2' role='status'></span>"
+              }
+              ${step.label}
+            </li>
+          `).join('');
+        }
+
+        updateTaskBadge(task);
+
+        // Update Extension when it changes from Auto
+        if (taskExtensions[task.id] && task.extension !== taskExtensions[task.id]) {
+          const clickableHeader = document.querySelector(`[href="#task-steps-${task.id}"] > div:first-child`);
+          if (clickableHeader) {
+            const formattedDate = formatDate(task.timestamp);
+
+            clickableHeader.innerHTML = `
+              <strong>${task.action}</strong> <span class="badge bg-info ms-2">${task.source}</span><br>
+              User: ${task.user}, Extension: ${task.extension}
+              <small class="text-muted">${formattedDate}</small>
+            `;
+          }
+          // Update memory to new value to avoid multiple rewrites
+          taskExtensions[task.id] = task.extension;
+        }
+
+        if (task.status === "Success" || task.status === "Failed") {
+          clearInterval(interval);
+          activePollers.delete(taskId); // remove task from active polling
+        }
+
+      } catch (err) {
+        console.error("Polling error:", err);
+        clearInterval(interval);
+        activePollers.delete(taskId); // remove task from active polling
+      }
+    }, 1500);
+  }
+
+  async function renderTaskHistory() {
+    const list = document.getElementById("taskHistoryList");
+    list.innerHTML = '';
+
+    try {
+      const res = await fetch("http://localhost:9999/api/task-history?since=24h");
+      const tasks = await res.json();
+      // Keep track of tasks in list
+      lastKnownTaskCount = tasks.length;
+
+      tasks.forEach(task => {
+        const badgeClass =
+          task.status === 'Success' ? 'bg-success' :
+          task.status === 'Failed' ? 'bg-danger' :
+          'bg-warning';
+
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.innerHTML = `
+          <div class="d-flex justify-content-between align-items-center"
+            data-bs-toggle="collapse"
+            href="#task-steps-${task.id}"
+            role="button"
+            aria-expanded="false"
+            aria-controls="task-steps-${task.id}"
+            onclick="lastExpandedTaskId='${task.id}'">
+            <div>
+              <strong>${task.action}</strong> <span class="badge bg-info ms-2">${task.source}</span><br>
+              User: ${task.user}, Extension: ${task.extension}
+              <small class="text-muted">${task.timestamp}</small>
+            </div>
+            <span class="badge ${badgeClass}" id="task-badge-${task.id}">${task.status}</span>
+          </div>
+          <div class="collapse mt-2" id="task-steps-${task.id}">
+            <ul class="list-group list-group-flush">
+              ${task.steps.map(step => `
+                <li class='list-group-item d-flex align-items-center'>
+                  ${step.status === 'done' ? "<span class='text-success me-2'>&#10003;</span>" :
+                    step.status === 'failed' ? "<span class='text-danger me-2'>&#10060;</span>" :
+                    "<span class='spinner-border spinner-border-sm text-secondary me-2' role='status'></span>"
+                  }
+                  ${step.label}
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+        `;
+        list.appendChild(li);
+      });
+
+      if (lastExpandedTaskId) {
+        const el = document.getElementById(`task-steps-${lastExpandedTaskId}`);
+        if (el) {
+          new bootstrap.Collapse(el, { show: true });
+        }
+      }
+
+      // Scroll to top AFTER tasks are rendered
+      setTimeout(() => {
+        list.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 200);
+
+    } catch (err) {
+      list.innerHTML = `<li class="list-group-item text-danger">Failed to load task history.</li>`;
+      console.error("Error fetching task history:", err);
+    }
+  }
+
+  function runDeletionTask() {
+    const confirmModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+    confirmModal.hide();
+    const associatedModal = bootstrap.Modal.getInstance(document.getElementById('associatedModal'));
+    if (associatedModal) associatedModal.hide();
+    createProvisioningTask("Delete Services", "jsmith", "1234");
+  }
+
+  function modifyExtension() {
+    const associatedModal = bootstrap.Modal.getInstance(document.getElementById('associatedModal'));
+    if (associatedModal) associatedModal.hide();
+
+    // Save the user ID for later
+    const userIdField = document.getElementById("userIdField");
+    if (userIdField) {
+      pendingModifyUserId = userIdField.innerText.trim();
+    }
+
+    const modifyModal = new bootstrap.Modal(document.getElementById('modifyExtensionModal'));
+    modifyModal.show();
+  }
+
+  function validateExtensionNumber(input) {
+    const num = Number(input);
+    if (Number.isNaN(num)) {
+      alert("Extension must be a number.");
+      return false;
+    }
+    if (num <= 0) {
+      alert("Extension must be a positive number.");
+      return false;
+    }
+    if (input.length > 10) {
+      alert("Extension seems too long.");
+      return false;
+    }
+    return true;
+  }
+
+  async function confirmModifyExtension() {
+    const newExtension = document.getElementById("newExtensionInput").value.trim();
+    if (!newExtension) {
+      alert("Please enter a new extension.");
+      return;
+    }
+
+    if (!validateExtensionNumber(newExtension)) {
+      return; // Re-run if validation fails
+    }
+
+  const modifyModal = bootstrap.Modal.getInstance(document.getElementById('modifyExtensionModal'));
+    modifyModal.hide();
+
+    if (pendingModifyUserId) {
+      await createProvisioningTask("Modify Extension", pendingModifyUserId, newExtension);
+      pendingModifyUserId = null;
+    }
+  }
+
+  document.querySelector("#manualExt").addEventListener("change", () => {
+    document.querySelector("#manualExtension").disabled = false;
+  });
+  document.querySelector("#autoExt").addEventListener("change", () => {
+    document.querySelector("#manualExtension").disabled = true;
+  });
+
+  function triggerLDAPSync() {
+    const btn = document.getElementById("ldapSyncBtn");
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Running...`;
+
+    fetch("http://localhost:9999/api/ldap-sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({})
+    })
+      .then(res => res.json())
+      .then(data => {
+        showToast(data.message);
+      })
+      .catch(err => {
+        console.error("LDAP sync failed", err);
+        alert("Failed to trigger LDAP sync");
+      })
+      .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+      });
+  }
+
+  async function triggerAutoProvisioning() {
+    const btn = document.getElementById("triggerAutoProvisionBtn");
+    btn.disabled = true;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Running...`;
+
+    try {
+      const res = await fetch("http://localhost:9999/api/auto-provision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({})
+      });
+      const data = await res.json();
+
+      showToast(data.message);
+    } catch (err) {
+      console.error("Auto provisioning failed", err);
+      alert("Failed to trigger auto provisioning");
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = originalText;
+    }
+  }
+
+
+  document.getElementById("manual-provision-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
+    const userId = document.getElementById("userId").value;
+    const extOption = document.querySelector("input[name='extensionOption']:checked").value;
+    const ext = extOption === "manual" ? document.getElementById("manualExtension").value : "auto";
+    createProvisioningTask("Manual Provisioning", userId, ext);
+  });
+
+  document.getElementById("search-form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const query = document.getElementById("searchInput").value.trim();
+    if (query.length < 3) {
+      alert("Please enter at least 3 characters to search.");
+      return;
+    }
+    const resultList = document.getElementById("resultList");
+    document.getElementById("searchWrapper").style.display = 'block';
+    const collapse = new bootstrap.Collapse(document.getElementById("searchResultsCollapse"), { toggle: false });
+    collapse.hide();
+    setTimeout(() => collapse.show(), 100);
+
+    resultList.innerHTML = '';
+
+    const mockResults = [
+      { id: 'jsmith', type: 'User', displayName: 'John Smith', extension: '1234', devices: ['CSFJS01', 'DPJS01'] },
+      { id: '1234', type: 'Extension', user: 'jsmith', devices: ['CSFJS01'] },
+      { id: 'CSFJS01', type: 'Device', user: 'jsmith', extension: '1234' },
+      { id: 'unlinkedExt', type: 'Extension' }
+    ];
+
+    const limitedResults = mockResults.slice(0, 25);
+    limitedResults.forEach(result => {
+      const item = document.createElement('li');
+      item.className = 'list-group-item d-flex justify-content-between align-items-center';
+      item.innerHTML = `
+        <div>
+          <strong>${result.id}</strong> <span class="badge bg-primary ms-2">${result.type}</span><br>
+          ${result.displayName ? 'Display Name: ' + result.displayName + '<br>' : ''}
+          ${result.extension ? 'Extension: ' + result.extension + '<br>' : ''}
+          ${result.devices ? 'Devices: ' + result.devices.join(', ') + '<br>' : ''}
+          ${result.user && !result.displayName ? 'User: ' + result.user + '<br>' : ''}
+        </div>
+        <div>
+          ${result.user || result.type === 'User' ? `<button class='btn btn-sm btn-outline-secondary' data-bs-toggle="modal" data-bs-target="#associatedModal" onclick="viewResult('${result.user || result.id}')">View</button>` : '<span class="text-muted">No user linked</span>'}
+        </div>
+      `;
+      resultList.appendChild(item);
+    });
+  });
+
+  function viewResult(userId) {
+    const content = document.getElementById("associatedContent");
+    content.innerHTML = `
+      <p><strong id="userIdField">${userId}</strong></p>
+      <p><strong>Extension:</strong> 1234</p>
+      <p><strong>Devices:</strong> CSF${userId.toUpperCase()}, DP${userId.toUpperCase()}</p>
+    `;
+  }
+
+  function showToast(message) {
+    const toastBody = document.getElementById("taskToastBody");
+    toastBody.textContent = message;
+    const toast = new bootstrap.Toast(document.getElementById("taskToast"));
+    toast.show();
+  }
+
+  async function openTaskHistory() {
+    const historyModal = new bootstrap.Modal(document.getElementById("taskHistoryModal"));
+    historyModal.show();
+    await renderTaskHistory();
+
+    // check if any tasks are Running and start polling
+    const res = await fetch("http://localhost:9999/api/task-history?since=24h");
+    const tasks = await res.json();
+    tasks.forEach(task => {
+      if (task.status === "Running") {
+        pollTaskStatus(task.id);
+      }
+    });
+  }
+
+  document.getElementById("taskHistoryModal").addEventListener('shown.bs.modal', () => {
+    startTaskPolling();
+  });
+
+  async function startTaskPolling() {
+    if (taskPollingInterval) return;
+
+    taskPollingInterval = setInterval(async () => {
+      const res = await fetch("http://localhost:9999/api/task-history?since=24h");
+      const tasks = await res.json();
+
+      if (tasks.length !== lastKnownTaskCount) {
+        lastKnownTaskCount = tasks.length;
+        console.log("NEW Reload task list....");
+        await renderTaskHistory();  // Only if new tasks detected
+
+        // After refreshing, poll any new "Running" tasks
+        tasks.forEach(task => {
+          if (task.status === "Running") {
+            pollTaskStatus(task.id); // <-- Restart polling individually
+          }
+        });
+      }
+    }, 5000); // Check every 15s
+  }
+
+  document.getElementById("taskHistoryModal").addEventListener('hidden.bs.modal', () => {
+    // Stop polling when modal closes
+    if (taskPollingInterval) {
+      clearInterval(taskPollingInterval);
+      taskPollingInterval = null;
+    }
+  });
+
+  function confirmDelete() {
+    const modal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    modal.show();
+  }
+
+  document.getElementById("openTaskHistoryBtn").addEventListener("click", openTaskHistory);
+
+  window.addEventListener("DOMContentLoaded", async () => {
+    try {
+      await renderTaskHistory(); // 📥 Fetch full task history and render it
+
+      const res = await fetch("http://localhost:9999/api/task-history?since=24h");
+      const tasks = await res.json();
+
+      tasks.forEach(task => {
+        if (task.status === "Running") {
+          pollTaskStatus(task.id); // 🔁 Restart polling for running tasks
+        }
+      });
+    } catch (err) {
+      console.error("Failed to fetch tasks at startup:", err);
+    }
+  });
+
+  function updateTaskBadge(task) {
+    const badge = document.querySelector(`#task-badge-${task.id}`);
+    if (!badge) return;
+
+    let badgeClass = "bg-warning";
+    let badgeText = task.status;
+    let glowing = false;
+    let justCompleted = false;
+    let justFailed = false;
+
+    if (task.status === "Success") {
+      badgeClass = "bg-success";
+      justCompleted = true;
+    } else if (task.status === "Failed") {
+      badgeClass = "bg-danger";
+      justFailed = true;
+    } else if (task.status === "Running") {
+      const allDone = task.steps.every(step => step.status === 'done');
+      if (allDone) {
+        badgeClass = "bg-success";
+        badgeText = "Running ✅";
+      } else {
+        glowing = true;
+      }
+    }
+
+    badge.textContent = badgeText;
+    badge.className = `badge ${badgeClass} ${glowing ? "badge-glow" : ""}`;
+
+    if (justCompleted) {
+      badge.classList.add("badge-success-flash");
+      setTimeout(() => badge.classList.remove("badge-success-flash"), 1600); // Remove flash after animation
+    }
+
+    if (justFailed) {
+      const row = badge.closest("li");
+      if (row) {
+        row.classList.add("task-wiggle");
+        setTimeout(() => row.classList.remove("task-wiggle"), 800); // wiggle cleanup
+      }
+    }
+  }
+
+</script>
+{% endblock %}

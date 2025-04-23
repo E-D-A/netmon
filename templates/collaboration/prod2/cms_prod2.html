@@ -1,0 +1,580 @@
+{% extends 'base.html' %}
+{% block title %}CMS - PROD2{% endblock %}
+{% block header %}CMS - PROD2{% endblock %}
+{% block breadcrumbs %}
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard') }}"><i class="bi bi-house-door me-1"></i> Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('collab_prod2') }}">Collaboration - PROD2</a></li>
+      <li class="breadcrumb-item active" aria-current="page">
+        <span class="breadcrumb-active">CMS</span>
+      </li>
+    </ol>
+  </nav>
+{% endblock %}
+
+{% block content %}
+
+<!-- System Info -->
+<h5 class="text-uppercase text-muted mb-3 mt-4"><i class="bi bi-cpu me-2"></i>CMS System Info</h5>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">CMS Version</span>
+        <span class="fw-bold text-dark">3.3.2</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">CMM Version</span>
+        <span class="fw-bold text-dark">3.3.1</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="text-muted">Cluster Health</span>
+        <span class="badge bg-success">Healthy</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Alert Section -->
+<div class="alert alert-warning small d-flex align-items-center mb-4 fade-in" role="alert">
+  <i class="bi bi-exclamation-triangle-fill me-2"></i>
+  <strong>Warning:</strong> Cluster 1 Node 1 is in degraded state. High CPU (79%) and service issues detected.
+</div>
+
+<!-- Performance section -->
+<h5 class="text-uppercase text-muted mb-3"><i class="bi bi-diagram-3 me-2"></i>Cluster 1</h5>
+<div class="row g-3 mb-4">
+
+  <!-- Cluster 1 Metrics -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm">
+      <div class="fw-bold text-muted mb-2">Cluster Overview</div>
+      <ul class="list-unstyled small mb-0">
+        <li>API Status: <span class="badge bg-success">UP</span></li>
+        <li>Active Meetings: <span class="fw-bold text-dark">4</span></li>
+        <li>Participants: <span class="fw-bold text-dark">47</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- CPU Load - Cluster 1 -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#cmsCpuCluster1Modal" title="View live CPU load">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">CPU Load</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Node 1: <span class="fw-bold text-success">34%</span></li>
+        <li>Node 2: <span class="fw-bold text-success">36%</span></li>
+        <li>Node 3: <span class="fw-bold text-success">32%</span></li>
+        <li>Node 4: <span class="fw-bold text-success">35%</span></li>
+        <li>DMZ: <span class="fw-bold text-warning">52%</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Call Load Chart - Cluster 1 -->
+  <div class="col-md-3">
+    <div class="card card-dashboard p-3 shadow-sm position-relative">
+      <button class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-2 px-2 py-0"
+        style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#cmsCluster1ChartModal" title="View call load chart">
+        <i class="bi bi-graph-up"></i>
+      </button>
+      <div class="fw-bold text-muted mb-2">Call Load</div>
+      <ul class="list-unstyled mb-0 small">
+        <li>Total Participants: <span class="fw-bold text-dark">67</span></li>
+      </ul>
+      <canvas id="cmsCluster1ChartCard" class="w-100" height="120"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<!-- Node Status Table -->
+<h5 class="text-uppercase text-muted mb-3"><i class="bi bi-table me-2"></i>Node & Service Status</h5>
+<div class="card table-wrapper shadow-sm mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm table-bordered table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Cluster</th>
+            <th>Role</th>
+            <th>Hostname</th>
+            <th>Status</th>
+            <th>Uptime</th>
+            <th>Version</th>
+            <th>CPU</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for i in range(1, 4) %}
+          <tr>
+            <td>Cluster 1</td>
+            <td>Node</td>
+            <td>cms-cl1-node{{ i }}</td>
+            <td><span class="badge bg-success">Healthy</span></td>
+            <td>22 days</td>
+            <td>3.3.2</td>
+            <td><span class="fw-bold text-success">{{ 33 + i }}%</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CMS Cluster 1 Call Load Modal -->
+<div class="modal fade" id="cmsCluster1ChartModal" tabindex="-1" aria-labelledby="cmsCluster1ChartLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      
+      <!-- Header -->
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="cmsCluster1ChartLabel">
+          <i class="bi bi-graph-up me-2"></i> Live CMS Call Load – Cluster 1
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadCMS1ChartBtn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Chart Container -->
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="cmsCluster1ModalChart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+
+      <!-- Timeout Alert -->
+      <div id="cmsChart1ExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartCMS1ChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CMS Cluster 1 CPU Load Modal -->
+<div class="modal fade" id="cmsCpuCluster1Modal" tabindex="-1" aria-labelledby="cmsCpuCluster1Label" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content shadow-sm border-0">
+      
+      <!-- Header -->
+      <div class="modal-header bg-light border-bottom">
+        <h5 class="modal-title fw-semibold text-dark" id="cmsCpuCluster1Label">
+          <i class="bi bi-graph-up me-2"></i> Live CPU Load – CMS Cluster 1
+        </h5>
+        <div class="d-flex align-items-center gap-2 ms-auto">
+          <button id="downloadCMSCpu1Btn" class="btn btn-sm btn-outline-secondary" title="Download as image">
+            <i class="bi bi-download"></i>
+          </button>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Chart Container -->
+      <div class="bg-light p-3 rounded-bottom">
+        <div class="bg-white p-3 rounded border shadow-sm">
+          <canvas id="cmsCpuCluster1Chart" class="w-100" style="height: 240px;"></canvas>
+        </div>
+      </div>
+
+      <!-- Timeout Notice -->
+      <div id="cmsCpu1ChartExpiredNotice" class="alert alert-warning d-none mt-3 p-2 small d-flex justify-content-between align-items-center">
+        <div>
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Live chart session ended after 2 minutes.
+        </div>
+        <button id="restartCMSCpu1ChartBtn" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-arrow-clockwise me-1"></i> Restart
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='js/chart.umd.js') }}"></script>
+<script src="{{ url_for('static', filename='js/chartjs-adapter-date-fns.bundle.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+<!-- Call Live script -->
+<script>
+  const cmsNodes = ['Node 1', 'Node 2', 'Node 3'];
+
+  function preloadCMSData() {
+    const now = Date.now();
+    return Array.from({ length: 10 }, (_, i) => {
+      const timestamp = new Date(now - (10 - i) * 3000).toISOString();
+      return cmsNodes.map(() => ({ x: timestamp, y: getRandomValue() }));
+    });
+  }
+
+  function createClusterChart(ctx, label) {
+    const datasets = cmsNodes.map((node, idx) => ({
+      label: node,
+      data: [],
+      borderColor: `hsl(${idx * 60}, 70%, 50%)`,
+      backgroundColor: `hsla(${idx * 60}, 70%, 50%, 0.1)`,
+      tension: 0.4,
+      fill: false,
+      pointRadius: 3
+    }));
+
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: { datasets },
+      options: {
+        responsive: true,
+        animation: { duration: 300, easing: 'easeOutQuart' },
+        layout: { padding: { right: 12 } },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom',
+            labels: {
+              color: '#333',
+              usePointStyle: true,
+              boxWidth: 10,
+              padding: 16
+            }                
+          },
+          tooltip: {
+            backgroundColor: '#212529',
+            titleColor: '#fff',
+            bodyColor: '#fff',
+            borderColor: '#6c757d',
+            borderWidth: 1,
+            padding: 10
+          }
+        },
+        layout: {
+          padding: { 
+            top: 40, 
+            right: 12
+          }
+        },
+        scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'second',
+              tooltipFormat: 'HH:mm:ss',
+              displayFormats: {
+                second: 'HH:mm:ss',
+                minute: 'HH:mm'
+              }
+            },
+            ticks: {
+              source: 'data',
+              autoSkip: true,
+              maxTicksLimit: 5,
+              maxRotation: 0,
+              color: '#333'
+            },
+            grid: { color: '#eee' }
+          },
+          y: {
+            beginAtZero: true,
+            suggestedMax: 100,
+            title: { display: true, text: 'Participants' },
+            ticks: { stepSize: 10 }
+          }
+        }
+      }
+    });
+
+    // Preload historical data
+    const history = preloadCMSData();
+    history.forEach((pointSet, i) => {
+      pointSet.forEach((point, j) => {
+        chart.data.datasets[j].data.push(point);
+      });
+    });
+
+    chart.update();
+    return chart;
+  }
+
+  function setupLiveCMSChart(modalId, canvasId, alertId, restartBtnId, downloadBtnId, chartRefName) {
+    let chartRef = null;
+    let intervalRef = null;
+    let timeoutRef = null;
+
+    const modal = document.getElementById(modalId);
+    const canvas = document.getElementById(canvasId);
+    const alertBox = document.getElementById(alertId);
+    const restartBtn = document.getElementById(restartBtnId);
+    const downloadBtn = document.getElementById(downloadBtnId);
+
+    modal.addEventListener('shown.bs.modal', () => {
+      if (!chartRef) {
+        chartRef = createClusterChart(canvas.getContext('2d'), 'Participants');
+        window[chartRefName] = chartRef;
+      }
+
+      intervalRef = setInterval(() => {
+        const now = getTimestamp();
+        chartRef.data.datasets.forEach(ds => {
+          ds.data.push({ x: now, y: getRandomValue() });
+          if (ds.data.length > 50) ds.data.shift();
+        });
+        chartRef.update('none');
+      }, 3000);
+
+      timeoutRef = setTimeout(() => {
+        clearInterval(intervalRef);
+        alertBox.classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    modal.addEventListener('hidden.bs.modal', () => {
+      clearInterval(intervalRef);
+      clearTimeout(timeoutRef);
+      alertBox.classList.add('d-none');
+    });
+
+    restartBtn.addEventListener('click', () => {
+      alertBox.classList.add('d-none');
+      intervalRef = setInterval(() => {
+        const now = getTimestamp();
+        chartRef.data.datasets.forEach(ds => {
+          ds.data.push({ x: now, y: getRandomValue() });
+          if (ds.data.length > 50) ds.data.shift();
+        });
+        chartRef.update('none');
+      }, 3000);
+
+      timeoutRef = setTimeout(() => {
+        clearInterval(intervalRef);
+        alertBox.classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      downloadChartWithTitle(chartRef, `${chartRefName}-chart.png`, 'CMS Call Load');
+    });
+
+  }
+
+  setupLiveCMSChart(
+    'cmsCluster1ChartModal',
+    'cmsCluster1ModalChart',
+    'cmsChart1ExpiredNotice',
+    'restartCMS1ChartBtn',
+    'downloadCMS1ChartBtn',
+    'cms1Chart'
+  );
+
+</script>
+
+<!-- Small chart script -->
+<script>
+  const cmsClusterChartDefaults = getMiniChartDefaults()
+
+  // Chart 1
+  const ctxCMS1 = document.getElementById('cmsCluster1ChartCard').getContext('2d');
+  new Chart(ctxCMS1, {
+    ...cmsClusterChartDefaults,
+    data: {
+      labels: ['10:00', '10:10', '10:20', '10:30', '10:40', '10:50', '11:00'],
+      datasets: [{
+        label: 'Participants',
+        data: [33, 41, 39, 47, 44, 69, 35],
+        borderColor: '#0d6efd',
+        backgroundColor: 'rgba(13,110,253,0.1)',
+        tension: 0.3,
+        fill: true
+      }]
+    }
+  });
+</script>
+
+<!-- CPU Live script -->
+<script>
+  const cpuColors = ['#0d6efd', '#198754', '#ffc107'];
+
+  function getCMSCpuDataPoint() {
+    return Math.floor(15 + Math.random() * 70);
+  }
+
+  function generateCpuLine(label, color) {
+    return {
+      label,
+      data: [],
+      borderColor: color,
+      backgroundColor: color + '22',
+      tension: 0.4,
+      fill: true
+    };
+  }
+
+  function setupCpuChart(modalId, canvasId, datasetLabels, expiredNoticeId, restartBtnId, downloadBtnId, chartRefObj) {
+    const chartKey = chartRefObj.key;
+    const intervalKey = chartRefObj.intervalKey;
+    const timeoutKey = chartRefObj.timeoutKey;
+
+    document.getElementById(modalId).addEventListener('shown.bs.modal', () => {
+      if (!window[chartKey]) {
+        const ctx = document.getElementById(canvasId).getContext('2d');
+        window[chartKey] = new Chart(ctx, {
+          type: 'line',
+          data: {
+            datasets: datasetLabels.map((label, idx) => generateCpuLine(label, cpuColors[idx]))
+          },
+          options: {
+            responsive: true,
+            animation: { duration: 300, easing: 'easeOutQuart' },
+            layout: { padding: { right: 12 } },
+            plugins: {
+              legend: {
+                display: true,
+                position: 'bottom',
+                labels: {
+                  color: '#333',
+                  usePointStyle: true,
+                  boxWidth: 10,
+                  padding: 16
+                }                
+              },
+              tooltip: {
+                backgroundColor: '#212529',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: '#6c757d',
+                borderWidth: 1,
+                padding: 10
+              }
+            },
+            layout: {
+              padding: { 
+                top: 40, 
+                right: 12
+              }
+            },
+            scales: {
+              x: {
+                type: 'time',
+                time: {
+                  unit: 'second',
+                  tooltipFormat: 'HH:mm:ss',
+                  displayFormats: {
+                    second: 'HH:mm:ss',
+                    minute: 'HH:mm'
+                  }
+                },
+                ticks: {
+                  source: 'data',
+                  autoSkip: true,
+                  maxTicksLimit: 5,
+                  maxRotation: 0,
+                  color: '#333'
+                },
+                grid: { color: '#eee' }
+              },
+              y: {
+                beginAtZero: true,
+                max: 100,
+                ticks: { stepSize: 10 },
+                title: {
+                  display: true,
+                  text: 'CPU %'
+                }
+              }
+            },
+            elements: {
+              point: { radius: 3 }
+            }
+          }
+        });
+
+        // Preload
+        for (let i = 10; i > 0; i--) {
+          const t = new Date(Date.now() - i * 3000);
+          window[chartKey].data.datasets.forEach(ds => {
+            ds.data.push({ x: t.toISOString(), y: getCMSCpuDataPoint() });
+          });
+        }
+        window[chartKey].update();
+      }
+
+      window[intervalKey] = setInterval(() => {
+        const now = getTimestamp();
+        window[chartKey].data.datasets.forEach(ds => {
+          ds.data.push({ x: now, y: getCMSCpuDataPoint() });
+          if (ds.data.length > 50) ds.data.shift();
+        });
+        window[chartKey].update('none');
+      }, 3000);
+
+      window[timeoutKey] = setTimeout(() => {
+        clearInterval(window[intervalKey]);
+        document.getElementById(expiredNoticeId).classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    document.getElementById(modalId).addEventListener('hidden.bs.modal', () => {
+      clearInterval(window[intervalKey]);
+      clearTimeout(window[timeoutKey]);
+      document.getElementById(expiredNoticeId).classList.add('d-none');
+    });
+
+    document.getElementById(restartBtnId).addEventListener('click', () => {
+      document.getElementById(expiredNoticeId).classList.add('d-none');
+      window[intervalKey] = setInterval(() => {
+        const now = getTimestamp();
+        window[chartKey].data.datasets.forEach(ds => {
+          ds.data.push({ x: now, y: getCMSCpuDataPoint() });
+          if (ds.data.length > 50) ds.data.shift();
+        });
+        window[chartKey].update('none');
+      }, 3000);
+
+      window[timeoutKey] = setTimeout(() => {
+        clearInterval(window[intervalKey]);
+        document.getElementById(expiredNoticeId).classList.remove('d-none');
+      }, MAX_LIVE_DURATION);
+    });
+
+    document.getElementById(downloadBtnId).addEventListener('click', () => {
+      downloadChartWithTitle(window[chartKey], `${canvasId}.png`, 'CMS CPU Load');
+    });
+
+  }
+
+  // Setup both charts
+  setupCpuChart(
+    'cmsCpuCluster1Modal',
+    'cmsCpuCluster1Chart',
+    ['Node 1', 'Node 2', 'Node 3'],
+    'cmsCpu1ChartExpiredNotice',
+    'restartCMSCpu1ChartBtn',
+    'downloadCMSCpu1Btn',
+    { key: 'cmsCpu1Chart', intervalKey: 'cmsCpu1Interval', timeoutKey: 'cmsCpu1Timeout' }
+  );
+</script>
+
+{% endblock %}

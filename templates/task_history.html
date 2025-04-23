@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+{% block title %}Full Task History{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">Full Provisioning Task History</h2>
+
+  <div class="row mb-3">
+    <div class="col-md-4">
+      <input type="text" id="taskSearch" class="form-control" placeholder="Search by user or extension">
+    </div>
+    <div class="col-md-8 text-end">
+      <div class="btn-group btn-group-sm" role="group">
+        <button class="btn btn-outline-secondary active" onclick="filterTasks('all', event)">All</button>
+        <button class="btn btn-outline-secondary" onclick="filterTasks('Manual', event)">Manual</button>
+        <button class="btn btn-outline-secondary" onclick="filterTasks('Automatic', event)">Automatic</button>
+        <button class="btn btn-outline-secondary" onclick="filterTasks('Failed', event)">Failed</button>
+      </div>
+    </div>
+  </div>
+
+  <table class="table table-bordered table-striped" id="taskTable">
+    <thead class="table-light">
+      <tr>
+        <th>User</th>
+        <th>Extension</th>
+        <th>Type</th>
+        <th>Source</th>
+        <th>Status</th>
+        <th>Triggered By</th>
+        <th>Timestamp</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Task Detail Modal -->
+<div class="modal fade" id="taskDetailModal" tabindex="-1" aria-labelledby="taskDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="taskDetailModalLabel">Task Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="taskDetailContent">
+          <!-- Steps injected dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+<script>
+let fullTaskList = [];
+
+function renderTaskTable(tasks) {
+  const tbody = document.querySelector("#taskTable tbody");
+
+  tbody.innerHTML = "";
+  tasks.forEach(task => {
+    const row = document.createElement("tr");
+    
+    row.innerHTML = `
+        <td>${task.user}</td>
+        <td>${task.extension}</td>
+        <td>${task.action}</td>
+        <td>${task.source}</td>
+        <td><span class="badge ${task.status === 'Success' ? 'bg-success' : task.status === 'Failed' ? 'bg-danger' : 'bg-secondary'}">${task.status}</span></td>
+        <td>${task.triggered_by || 'System'}</td>
+        <td>${task.timestamp}</td>
+        <td><button class="btn btn-sm btn-outline-secondary" onclick="viewTaskDetails('${task.id}')">View</button></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+function filterTasks(type, event) {
+  document.querySelectorAll(".btn-group button").forEach(btn => btn.classList.remove("active"));
+  event.target.classList.add("active");
+
+  let filtered = fullTaskList;
+  if (type !== "all") {
+    filtered = fullTaskList.filter(task => task.source === type || task.status === type);
+  }
+  const searchVal = document.getElementById("taskSearch").value.toLowerCase();
+  if (searchVal) {
+    filtered = filtered.filter(task =>
+      task.user.toLowerCase().includes(searchVal) || task.extension.includes(searchVal)
+    );
+  }
+  renderTaskTable(filtered);
+}
+
+function viewTaskDetails(taskId) {
+  const task = fullTaskList.find(t => t.id === taskId);
+  if (!task) return;
+
+  const container = document.getElementById("taskDetailContent");
+  container.innerHTML = `
+    <p><strong>User:</strong> ${task.user} - 
+    <strong>Extension:</strong> ${task.extension} - 
+    <strong>Status:</strong> ${task.status}</p>
+    <p><strong>Triggered By:</strong> ${task.triggered_by || 'System'}</p>
+    <p><strong>Steps:</strong></p>
+    <ul class="list-group">
+      ${task.steps.map(step => `
+        <li class="list-group-item d-flex align-items-center">
+          ${step.status === 'done' ? '✅' :
+            step.status === 'failed' ? '❌' :
+            '⏳'}
+          <span class="ms-2">${step.label}</span>
+        </li>
+      `).join('')}
+    </ul>
+  `;
+
+  const modal = new bootstrap.Modal(document.getElementById("taskDetailModal"));
+  modal.show();
+}
+
+
+document.getElementById("taskSearch").addEventListener("input", () => filterTasks("all"));
+
+window.addEventListener("DOMContentLoaded", async () => {
+  const res = await fetch("http://localhost:9999/api/task-history");
+  fullTaskList = await res.json();
+  renderTaskTable(fullTaskList);
+});
+</script>
+{% endblock %}
