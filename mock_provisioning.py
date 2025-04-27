@@ -168,7 +168,7 @@ def get_task_history():
 def ldap_sync():
     global last_sync_time
 
-    if time.time() - last_sync_time < 5:
+    if time.time() - last_sync_time < 300:
         return jsonify({"status": "warning", "message": "LDAP Sync in progress... Wait at least 5 min and try again."})
     else:
         last_sync_time = time.time()
